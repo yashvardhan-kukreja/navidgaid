@@ -1,13 +1,11 @@
+const mqtt = require("mqtt");
 const router = require("express").Router();
 const location_objs = require("./coordinates");
 const middlewares = require("./middlewares");
 
-const mqtt = require("mqtt");
-
 
 const client  = mqtt.connect('mqtt://test.mosquitto.org')
 
-    
 client.on('connect', function () {
     client.subscribe("presence", function (err) {
         if (!err) {
@@ -50,18 +48,18 @@ latest_rssi_to_rssi_distances["4-3"] = 0;
 
 router.post("/update-variables", (req, res) => {
 
-    var rssi1 = middlewares.coordinate_calculator(req.body.rssi1);
-    var rssi2 = middlewares.coordinate_calculator(req.body.rssi2);
-    var rssi3 = middlewares.coordinate_calculator(req.body.rssi3);
-    var rssi4 = middlewares.coordinate_calculator(req.body.rssi4);
-    var rssi12 = middlewares.coordinate_calculator(parseInt(req.body.wrt1.substring(15,18),10));
-    var rssi14 = middlewares.coordinate_calculator(parseInt(req.body.wrt1.substring(19,22),10));
-    var rssi23 = middlewares.coordinate_calculator(parseInt(req.body.wrt2.substring(15,18),10));
-    var rssi21 = middlewares.coordinate_calculator(parseInt(req.body.wrt2.substring(19,22),10));
-    var rssi34 = middlewares.coordinate_calculator(parseInt(req.body.wrt3.substring(15,18),10));
-    var rssi32 = middlewares.coordinate_calculator(parseInt(req.body.wrt3.substring(19,22),10));
-    var rssi41 = middlewares.coordinate_calculator(parseInt(req.body.wrt4.substring(15,18),10));
-    var rssi43 = middlewares.coordinate_calculator(parseInt(req.body.wrt4.substring(19,22),10));
+    var rssi1 = middlewares.distance_extractor(req.body.rssi1);
+    var rssi2 = middlewares.distance_extractor(req.body.rssi2);
+    var rssi3 = middlewares.distance_extractor(req.body.rssi3);
+    var rssi4 = middlewares.distance_extractor(req.body.rssi4);
+    var rssi12 = middlewares.distance_extractor(parseInt(req.body.wrt1.substring(15,18),10));
+    var rssi14 = middlewares.distance_extractor(parseInt(req.body.wrt1.substring(19,22),10));
+    var rssi23 = middlewares.distance_extractor(parseInt(req.body.wrt2.substring(15,18),10));
+    var rssi21 = middlewares.distance_extractor(parseInt(req.body.wrt2.substring(19,22),10));
+    var rssi34 = middlewares.distance_extractor(parseInt(req.body.wrt3.substring(15,18),10));
+    var rssi32 = middlewares.distance_extractor(parseInt(req.body.wrt3.substring(19,22),10));
+    var rssi41 = middlewares.distance_extractor(parseInt(req.body.wrt4.substring(15,18),10));
+    var rssi43 = middlewares.distance_extractor(parseInt(req.body.wrt4.substring(19,22),10));
 
     latest_rssi_to_rssi_distances["1-2"] = rssi12 || latest_rssi_to_rssi_distances["1-2"];
     latest_rssi_to_rssi_distances["1-4"] = rssi14 || latest_rssi_to_rssi_distances["1-4"];
@@ -152,8 +150,8 @@ router.get("/coordinates", (req, res) => {
         payload: {
             user_location: latest_source_coordinates, // [1.22323, 2.12323]
             target_location: latest_target_coordinates,
-            length: (latest_rssi_to_rssi_distances["1-2"]+latest_rssi_to_rssi_distances["3-4"])/2,
-            breadth: (latest_rssi_to_rssi_distances["1-3"]+latest_rssi_to_rssi_distances["2-4"])/2,
+            length: (latest_rssi_to_rssi_distances["1-2"]+latest_rssi_to_rssi_distances["4-3"])/2,
+            breadth: (latest_rssi_to_rssi_distances["1-4"]+latest_rssi_to_rssi_distances["2-3"])/2,
             direction: latest_direction,
             angle_offset: latest_angle_offset
         }
