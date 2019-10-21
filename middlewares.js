@@ -9,3 +9,8 @@ module.exports.coordinate_calculator = (rssi_to_rssi_distances, client_to_rssi_d
 
     return [x_coord, y_coord];
 };
+
+module.exports.distance_extractor = (distance) => {
+
+    return (distance) ?  Math.pow(10, (-73-distance)/20) : distance;
+}

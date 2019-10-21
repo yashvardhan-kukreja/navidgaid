@@ -18,4 +18,4 @@ app.get("/", (req, res) => {
     res.send("yes");
 });
 
-app.listen(port, "0.0.0.0");
+app.listen(port, () => console.log(`Server running successfully on port number: ${port}...`));

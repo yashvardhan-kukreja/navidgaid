@@ -16,40 +16,67 @@ client.on('connect', function () {
     }); 
   });
 
-
-
-  
-
-let latest_rssi_to_rssi_distances;
-let latest_client_to_rssi_distances;
-let latest_source_coordinates;
-let latest_target_coordinates;
+let latest_rssi_to_rssi_distances = {};
+let latest_client_to_rssi_distances = {};
+let latest_source_coordinates = [];
+let latest_target_coordinates = [];
 let latest_direction;
 let latest_angle_offset;
 
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////              CHANGE KAR ISSE BC 
+//////////////////////////////////////
+
+latest_rssi_to_rssi_distances["1-2"] = 0;
+latest_rssi_to_rssi_distances["1-4"] = 0;
+latest_rssi_to_rssi_distances["2-3"] = 0;
+latest_rssi_to_rssi_distances["2-1"] = 0;
+latest_rssi_to_rssi_distances["3-4"] = 0;
+latest_rssi_to_rssi_distances["3-2"] = 0;
+latest_rssi_to_rssi_distances["4-1"] = 0;
+latest_rssi_to_rssi_distances["4-3"] = 0;
+
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+
+
 router.post("/update-variables", (req, res) => {
 
-    //console.log(req.body);
+    var rssi1 = middlewares.coordinate_calculator(req.body.rssi1);
+    var rssi2 = middlewares.coordinate_calculator(req.body.rssi2);
+    var rssi3 = middlewares.coordinate_calculator(req.body.rssi3);
+    var rssi4 = middlewares.coordinate_calculator(req.body.rssi4);
+    var rssi12 = middlewares.coordinate_calculator(parseInt(req.body.wrt1.substring(15,18),10));
+    var rssi14 = middlewares.coordinate_calculator(parseInt(req.body.wrt1.substring(19,22),10));
+    var rssi23 = middlewares.coordinate_calculator(parseInt(req.body.wrt2.substring(15,18),10));
+    var rssi21 = middlewares.coordinate_calculator(parseInt(req.body.wrt2.substring(19,22),10));
+    var rssi34 = middlewares.coordinate_calculator(parseInt(req.body.wrt3.substring(15,18),10));
+    var rssi32 = middlewares.coordinate_calculator(parseInt(req.body.wrt3.substring(19,22),10));
+    var rssi41 = middlewares.coordinate_calculator(parseInt(req.body.wrt4.substring(15,18),10));
+    var rssi43 = middlewares.coordinate_calculator(parseInt(req.body.wrt4.substring(19,22),10));
 
-    client.publish('presence', 'something');
-
-    client.on('message', function (topic, message) {
-        // message is Buffer
-        console.log(message.toString())
-      })
-
+    latest_rssi_to_rssi_distances["1-2"] = rssi12 || latest_rssi_to_rssi_distances["1-2"];
+    latest_rssi_to_rssi_distances["1-4"] = rssi14 || latest_rssi_to_rssi_distances["1-4"];
+    latest_rssi_to_rssi_distances["2-3"] = rssi23 || latest_rssi_to_rssi_distances["2-3"];
+    latest_rssi_to_rssi_distances["2-1"] = rssi21 || latest_rssi_to_rssi_distances["2-1"];
+    latest_rssi_to_rssi_distances["3-4"] = rssi34 || latest_rssi_to_rssi_distances["3-4"];
+    latest_rssi_to_rssi_distances["3-2"] = rssi32 || latest_rssi_to_rssi_distances["3-2"];
+    latest_rssi_to_rssi_distances["4-1"] = rssi41 || latest_rssi_to_rssi_distances["4-1"];
+    latest_rssi_to_rssi_distances["4-3"] = rssi43 || latest_rssi_to_rssi_distances["4-3"];
     
-//   client.on('message', function (topic, message) {
-//     // message is Buffer
-//     console.log(message.toString());
-//   });
-
-
-
-    let {text, rssi_to_rssi_distances, client_to_rssi_distances, compass} = req.body;
-
-    latest_rssi_to_rssi_distances = rssi_to_rssi_distances;
-    latest_client_to_rssi_distances = client_to_rssi_distances;
+    latest_client_to_rssi_distances["1"] = rssi1 || latest_client_to_rssi_distances["1"];
+    latest_client_to_rssi_distances["2"] = rssi2 || latest_client_to_rssi_distances["2"];
+    latest_client_to_rssi_distances["3"] = rssi3 || latest_client_to_rssi_distances["3"];
+    latest_client_to_rssi_distances["4"] = rssi4 || latest_client_to_rssi_distances["4"];
+    
 
     words = text.split(" ");
     let locations = Object.keys(location_objs);
@@ -60,8 +87,6 @@ router.post("/update-variables", (req, res) => {
             break;
         }
     }
-
-
 
     // {
     //     "text": "Take me to the bathroom",
